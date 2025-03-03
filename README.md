@@ -6,26 +6,28 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 
 
 
-
-
-
-
 <img src="/포스터.jpg" width="7500" height="9933">
 <img src="/부록.png" width="1636" height="458">
 
+# How to use
 
 
 
 # References
 HR-VITON
 https://github.com/sangyun884/HR-VITON
+
 Posenet
 https://github.com/rwightman/posenet-python
+
 Graphonomy
 https://github.com/Gaoyiminggithub/Graphonomy
+
 detectron2
 https://github.com/facebookresearch/detectron2
+
 cloth image segmentation
 https://github.com/ternaus/cloths_segmentation
+
 Viton Model
 https://github.com/lastdefiance20/TryYours-Virtual-Try-On
