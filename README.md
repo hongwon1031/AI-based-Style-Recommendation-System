@@ -11,7 +11,7 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 
 # How to use
 - install the package('https://github.com/hongwon1031/pro/blob/master/requirements.txt')
-- download pretrained CNN model'https://drive.google.com/file/d/1nkcS0pXqqoy2PGaLDLAa16Cx5rzmA1n4/view?usp=sharing'
+- download pretrained CNN model 'https://drive.google.com/file/d/1nkcS0pXqqoy2PGaLDLAa16Cx5rzmA1n4/view?usp=sharing'
 - setting the file path(app2.py, main.py)
 - install the app2.py
 # image path
@@ -24,9 +24,10 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 - Semantic Segmentation
   - Graphonomy-master/HR-VITON-main/test/test/image-densepose
 - Semantic Segmentation(grayscale)
-  - Graphonomy-master/HR-VITON-main/test/test/image-parse-v3	
-
-
+  - Graphonomy-master/HR-VITON-main/test/test/image-parse-v3
+- Output Image
+  - Graphonomy-master/HR-VITON-main/Output
+  - <img src="/HR-VITON-main/Output/output_00000.png" width="1000" height="1300">
 
 # References
 HR-VITON
