@@ -10,6 +10,21 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 <img src="/부록.png" width="1636" height="458">
 
 # How to use
+- install the package('https://github.com/hongwon1031/pro/blob/master/requirements.txt')
+- [download pretrained CNN model]('https://drive.google.com/file/d/1nkcS0pXqqoy2PGaLDLAa16Cx5rzmA1n4/view?usp=sharing')
+- setting the file path(app2.py, main.py)
+- install the app2.py
+# image path
+- segmented image(cloth)
+  - Graphonomy-master/HR-VITON-main/test/test/cloth
+- mask image(cloth)
+  - Graphonomy-master/HR-VITON-main/test/test/cloth-mask
+- segmentation(cloth)
+  - Graphonomy-master/HR-VITON-main/test/test/image
+- Semantic Segmentation
+  - Graphonomy-master/HR-VITON-main/test/test/image-densepose
+- Semantic Segmentation(grayscale)
+  - Graphonomy-master/HR-VITON-main/test/test/image-parse-v3	
 
 
 
