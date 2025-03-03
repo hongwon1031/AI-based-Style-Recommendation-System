@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Processing...</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='./style.css')}}">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: url("{{ url_for('static', filename='backgrounds/buffer.gif') }}") no-repeat center center / cover;
+            font-family: Arial, sans-serif;
+        }
+        #loading {
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        Processing your virtual fitting... Please wait.
+    </div>
+    <script>
+        // 5초 후 `/process`로 이동 (시간은 백엔드 작업 시간과 맞춤)
+        setTimeout(() => {
+            window.location.href = '/view';
+        }, 5000); // 5초
+    </script>
+</body>
+</html>

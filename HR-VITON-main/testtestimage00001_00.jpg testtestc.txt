@@ -1,0 +1,1 @@
+test/test/image/00001_00.jpg test/test/cloth/00001_01.jpg

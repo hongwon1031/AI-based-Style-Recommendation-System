@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Virtual Fitting Result</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='./style.css')}}">
+</head>
+<body>
+    <div style="text-align: center; margin-top: 50px;">
+        <h1>Virtual Fitting Result</h1>
+        <p>{{ message }}</p>
+        <img src="{{ image_url }}" alt="Fitting Result" style="max-width: 90%; height: auto; margin-top: 20px;">
+    </div>
+</body>
+</html>

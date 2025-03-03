@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Two Containers Layout with Full Features</title>
+    <link rel="stylesheet" href="{{url_for('static', filename='./style.css')}}">
+    <style>
+        body {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            position: relative;
+        }
+        .container {
+            width: 45%;
+            height: 80%;
+            padding: 20px;
+            border: 2px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+        }
+        #camera {
+            width: 100%;
+            height: 80%;
+        }
+        #capture-button {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #captured-image{
+            margin-top: 20px;
+            width: 100%;
+            height: auto;
+        }
+
+        #uploaded-cloth-image {
+        margin-top: 20px;
+        width: 100%;
+        height: auto;
+        max-width: 100%;
+        max-height: calc(100% - 40px); /* 컨테이너 높이의 100%에서 패딩과 여백을 뺀 값 */
+        object-fit: contain; /* 이미지가 컨테이너 내에 맞춰서 조정되도록 설정 */
+    }
+        #generate-button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+        #loading-animation {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        #result-status {
+            text-align: center;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="left-container">
+        <h2 id="left-header">User Image Capture</h2>
+        <video id="camera" autoplay></video>
+        <button id="capture-button">Capture Image</button>
+        <canvas id="canvas" style="display: none;"></canvas>
+        <img id="captured-image" src="#" alt="Captured Image" style="display: none;" />
+    </div>
+    <div class="container" id="right-container">
+        <h2>세그멘테이션 의류 업로드</h2>
+        <button type="button" id="cloth-upload-button">세그멘테이션 의류 업로드</button>
+        <div id="cloth-upload-status"></div>
+        <img id="uploaded-cloth-image" src="static/cloth_web.jpg" alt="Uploaded Cloth Image" style="display: none;" />
+    </div>
+
+    <button id="generate-button">Generate Image</button>
+    <div id="loading-animation">Loading... Please wait.</div>
+    <div id="result-status"></div>
+
+    <script>
+        // 카메라 접근 및 캡처 기능 구현
+        const video = document.getElementById('camera');
+        const canvas = document.getElementById('canvas');
+        const captureButton = document.getElementById('capture-button');
+        const capturedImage = document.getElementById('captured-image');
+        const leftHeader = document.getElementById('left-header');
+        const generateButton = document.getElementById('generate-button');
+        const loadingAnimation = document.getElementById('loading-animation');
+        const resultStatus = document.getElementById('result-status');
+        const clothUploadButton = document.getElementById('cloth-upload-button');
+        const clothUploadStatus = document.getElementById('cloth-upload-status');
+        const uploadedClothImage = document.getElementById('uploaded-cloth-image');
+
+        // 카메라 접근 권한 요청
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                console.error("Error accessing camera: ", err);
+            });
+
+        // 캡처 버튼 클릭 시 이미지 캡처 및 자동 업로드
+        captureButton.addEventListener('click', () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // 캡처한 이미지를 Blob 형식으로 변환하고 미리보기
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                capturedImage.src = url;
+                capturedImage.style.display = 'block';
+
+                // 다른 요소들 숨기기
+                video.style.display = 'none';
+                captureButton.style.display = 'none';
+                leftHeader.style.display = 'none';
+
+                // 자동으로 이미지 업로드
+                const formData = new FormData();
+                formData.append('file', blob, 'captured_image.jpg');
+
+                fetch('/fileUpload', {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log("Captured image uploaded successfully!");
+                })
+                .catch(error => {
+                    console.error('Error uploading captured image:', error);
+                    alert('Failed to upload the captured image. Please try again.');
+                });
+
+                console.log("Image captured and displayed.");
+            }, 'image/jpeg');
+        });
+
+clothUploadButton.addEventListener('click', () => {
+    fetch('/fileUpload_cloth_auto', {
+        method: 'POST'
+    })
+    .then(response => response.text())
+    .then(data => {
+        // 캐시 방지를 위해 URL에 타임스탬프 추가
+        const timestamp = new Date().getTime();
+        uploadedClothImage.src = `static/cloth_web.jpg?timestamp=${timestamp}`;
+        uploadedClothImage.style.display = 'block';
+        console.log("Latest cloth image uploaded successfully!");
+    })
+    .catch(error => {
+        console.error('Error uploading latest cloth image:', error);
+        clothUploadStatus.innerText = "Failed to upload the latest cloth image. Please try again.";
+    });
+});
+
+// 이미지 생성 버튼 클릭 시 가상 피팅 이미지 생성
+generateButton.addEventListener('click', () => {
+    // "로딩 중" 애니메이션을 숨기고 바로 /buffer로 이동
+    loadingAnimation.style.display = 'none';
+
+    // /buffer 페이지로 이동
+    window.location.href = '/buffer';
+});
+    </script>
+</body>
+</html>

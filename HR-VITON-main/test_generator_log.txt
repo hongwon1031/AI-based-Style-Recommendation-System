@@ -1,0 +1,14 @@
+Starting test_generator script...
+Start to test! - HR-VITON
+Using device: cpu
+CUDA enabled: True
+CUDA available: False
+Network [SPADEGenerator] was created. Total number of parameters: 100.5 million. To see the architecture, do print(network).
+Using CPU for model
+Using device: cpu
+CUDA enabled: True
+CUDA available: False
+Processed 1 images
+[0m[0m[0m[0mTest time: 37.16 seconds
+Finished testing!
+[0m[0m[0m[0m[0m

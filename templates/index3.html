@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>패션 아이템 검색</title>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    #initialContainer {
+      width: 100%;
+      height: 100vh;
+      display: block;
+      text-align: center;
+      padding-top: 20px;
+      background-color: #f9f9f9;
+    }
+
+    button {
+      width: 200px;
+      margin: 10px;
+      padding: 10px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    #resultContainer {
+      display: none;
+      width: 100%;
+      height: 100vh;
+    }
+
+    #leftContainer, #rightContainer {
+      width: 50%;
+      height: 100%;
+      float: left;
+      box-sizing: border-box;
+      padding: 20px;
+    }
+
+    #leftContainer {
+      background-color: #f4f4f4;
+      border-right: 2px solid #ddd;
+    }
+
+    #rightContainer {
+      background-color: #ffffff;
+    }
+
+    #jsonResult {
+      font-size: 16px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <!-- 초기 버튼 컨테이너 -->
+  <div id="initialContainer">
+    <h1>패션 아이템 검색</h1>
+    <button id="combinationButton">상의+하의+아우터 조합 찾기</button>
+    <button id="dressButton">원피스 찾기</button>
+  </div>
+
+  <!-- 결과 컨테이너 -->
+  <div id="resultContainer">
+    <div id="leftContainer">
+      <h2>JSON 매칭 결과</h2>
+      <p id="jsonResult"></p>
+    </div>
+    <div id="rightContainer">
+      <h2>네이버 API 결과</h2>
+      <p id="naverResult"></p>
+    </div>
+    <video id="camera" width="320" height="240" autoplay style="display:none;"></video>
+    <button id="capture-button" style="display:none;">Capture Image</button>
+    <canvas id="canvas" style="display:none;"></canvas>
+    <form id="upload-form" action="/fileUpload" method="POST" enctype="multipart/form-data" style="display: none;">
+        <input type="file" name="file" id="file-input" accept="image/*" />
+        <input type="submit" />
+    </form>
+  </div>
+
+  <script>
+    $(document).ready(function() {
+      const OTHER_FLASK_SERVER_URL = 'http://127.0.0.1:5001/capture';
+
+      // JSON 매칭 함수
+      function performJsonMatching(type) {
+        $("#jsonResult").text("JSON 매칭 중...");
+
+        fetch(`/search-json-${type}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ conditions: null }),
+        })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            $("#jsonResult").text(`Error: ${data.error}`);
+          } else {
+            $("#jsonResult").text(`매칭된 JSON 파일: ${data.recommended_json}`);
+            performNaverApiCall(type);
+          }
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          $("#jsonResult").text("JSON 매칭 중 오류가 발생했습니다.");
+        });
+      }
+
+      // 네이버 API 호출 함수
+      function performNaverApiCall(type) {
+        $("#naverResult").text("네이버 API 호출 중...");
+
+        fetch(`/search`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            style: type === "bottom" ? 1 : 2
+          }),
+        })
+        .then((response) => response.text())
+        .then((data) => {
+          $("#naverResult").html(data);
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          $("#naverResult").text("네이버 API 호출 중 오류가 발생했습니다.");
+        });
+      }
+
+      // 카메라 캡처 및 업로드 설정 함수
+      function setupCameraCapture() {
+          const video = document.getElementById('camera');
+          const canvas = document.getElementById('canvas');
+          const captureButton = document.getElementById('capture-button');
+          const fileInput = document.getElementById('file-input');
+          const uploadForm = document.getElementById('upload-form');
+
+          // 카메라 접근 권한 요청
+          navigator.mediaDevices.getUserMedia({ video: true })
+              .then(stream => {
+                  video.srcObject = stream;
+                  video.style.display = "block";  // 카메라 화면 표시
+                  captureButton.style.display = "block";  // 캡처 버튼 표시
+              })
+              .catch(err => {
+                  console.error("Error accessing camera: ", err);
+              });
+
+          // 캡처 버튼 클릭 시 이미지 캡처 및 자동 업로드
+          captureButton.addEventListener('click', () => {
+              const context = canvas.getContext('2d');
+              canvas.width = video.videoWidth;
+              canvas.height = video.videoHeight;
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+              // 캡처한 이미지를 Blob 형식으로 변환
+              canvas.toBlob(blob => {
+                  const file = new File([blob], "captured_image.jpg", { type: "image/jpeg" });
+
+                  // 파일 입력 요소에 Blob 파일 설정
+                  const dataTransfer = new DataTransfer();
+                  dataTransfer.items.add(file);
+                  fileInput.files = dataTransfer.files;
+
+                  // 폼 자동 제출
+                  uploadForm.submit();
+              }, 'image/jpeg');
+          });
+      }
+
+      // 버튼 클릭 이벤트
+      $("#combinationButton").click(function() {
+        $("#initialContainer").hide();
+        $("#resultContainer").show();
+        performJsonMatching("bottom");
+      });
+
+      $("#dressButton").click(function() {
+        $("#initialContainer").hide();
+        $("#resultContainer").show();
+        performJsonMatching("dress");
+      });
+
+      $("#vtonButton").click(function() {
+        // 먼저 GET 요청 보내기
+        fetch("/2", {
+          method: "GET",
+        })
+        .then((response) => response.text())
+        .then((data) => {
+          console.log("GET 요청 성공:", data);
+
+          // 페이지 전체를 새로운 URL로 이동하여 새로 렌더링
+          window.location.href = "2";  // 예를 들어 /new-page-url로 이동
+
+          // 페이지가 완전히 로드된 후 카메라 설정 실행
+          $(window).on("load", function() {
+              setupCameraCapture();  // 새로 로드된 페이지에서 카메라 기능 설정
+          });
+        })
+        .catch((error) => {
+          console.error("Error:", error);
+          alert("VTON 작업 실행 중 오류가 발생했습니다.");
+        });
+      });
+    });
+  </script>
+</body>
+</html>

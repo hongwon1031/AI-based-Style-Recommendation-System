@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI 패션 시스템</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+      /*background: url("{{ url_for('static', filename='backgrounds/animation.gif') }}") no-repeat center center / cover;*/
+      background-color: #f4f4f4;
+    }
+
+    .container {
+      width: 100%;
+      height: 95%;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+    }
+
+    #header {
+      position: absolute; /* 화면 상단에 고정 */
+      top: 0;
+      width: 100%;
+      text-align: center; /* 중앙 정렬 */
+      padding: 8px 0; /* 상하 간격 */
+      font-size: 24px; /* 글자 크기 */
+      font-weight: bold;
+      color: #333; /* 글자 색상 */
+      z-index: 10; /* 다른 요소 위에 표시 */
+    }
+
+    #cameraContainer {
+      width: 60%;
+      height: 80%;
+      background-color: #ffffff;
+        border: 2px solid #000000;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      align-items: center;
+      position: absolute;
+      left: 35%;
+      top: 15%; /* 헤더 때문에 아래로 약간 이동 */
+      transition: transform 1s ease-in-out;
+    }
+
+    #videoElement {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    #captureButton {
+      z-index: 1;
+      margin-bottom: 20px;
+      padding: 15px 20px;
+      font-size: 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    #captureButton:hover {
+      background-color: #45a049;
+    }
+
+    #countMessage {
+      font-size: 16px;
+      color: black;
+      margin-top: 10px;
+    }
+
+    #resultContainer {
+      width: 30%;
+      background-color: #ffffff;
+      height: auto;
+        border: 2px solid #000000;
+      text-align: center;
+      display: none;
+      transition: opacity 1s ease-in-out;
+      position: absolute;
+      left: 50%;
+      top: 15%; /* 헤더 때문에 아래로 약간 이동 */
+      transform: translateX(-50%);
+    }
+
+    .hidden {
+      visibility: hidden;
+      opacity: 0;
+      transition: opacity 0.5s ease-in-out;
+    }
+
+    .visible {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    #result {
+      margin-bottom: 60px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: left;
+      line-height: 1.7;
+    }
+
+    #classification {
+      margin-top: 160px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: left;
+      line-height: 1.7;
+    }
+
+    #styleContainer {
+        width: 30%;
+        height: 75%;
+        background-color: #ffffff;
+        border: 2px solid #000000;
+        text-align: center;
+        display: none;
+        transition: opacity 1s ease-in-out;
+        flex-direction: column;
+        justify-content: center; /* 중앙 정렬 */
+        align-items: center; /* 중앙 정렬 */
+        position: absolute;
+        top : 15%;
+        right: 2%; /* 오른쪽 여백 */
+}
+
+  #findFashionItemsButton {
+    position: fixed; /* 고정 위치 */
+    bottom: 20px; /* 화면 아래에서 20px */
+    right: 20px; /* 화면 오른쪽에서 20px */
+    background-color: #4CAF50; /* 초록색 배경 */
+    color: white; /* 흰색 글자 */
+    border: none; /* 테두리 없음 */
+    border-radius: 10px; /* 둥근 모서리 */
+    padding: 15px 20px; /* 내부 여백 */
+    font-size: 16px; /* 글자 크기 */
+    cursor: pointer; /* 클릭 가능한 커서 */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3); /* 그림자 효과 */
+    z-index: 1000; /* 다른 요소 위에 표시 */
+    display: none; /* 초기에는 숨김 */
+    transition: opacity 0.5s ease-in-out; /* 부드러운 등장 애니메이션 */
+  }
+  </style>
+
+</head>
+<body>
+  <!-- 상단 헤더 -->
+  <div id="header">
+    <h1>AI 체형 보완패션 시스템</h1>
+  </div>
+
+  <div class="container">
+    <!-- 카메라 영역 -->
+    <div id="cameraContainer">
+      <video id="videoElement" autoplay></video>
+      <button id="captureButton">촬영</button>
+      <div id="transparentContainer"></div>
+      <div id="countMessage">현재 촬영: 0/3 (3회 남았습니다)</div>
+    </div>
+
+    <!-- 중앙: 신체 치수 및 체형 분석 결과 -->
+    <div id="resultContainer" class="hidden">
+      <div id="result"></div>
+      <div id="classification"></div>
+    </div>
+  </div>
+    <!-- 오른쪽: 신체 치수 및 체형 분석 결과 -->
+    <div id="styleContainer" class="hidden">
+        <h2>[당신의 체형을 보완할 스타일]</h2>
+        <p id="styleMessage"></p>
+    </div>
+
+  <!-- 버튼 추가 -->
+<button id="findFashionItemsButton" onclick="goToIndex3()" style="display: none; opacity: 0;">패션아이템 찾으러 가기</button>
+
+
+  <script>
+    const video = document.getElementById('videoElement');
+    const captureButton = document.getElementById('captureButton');
+    const cameraContainer = document.getElementById('cameraContainer');
+    const countMessage = document.getElementById('countMessage');
+    const resultContainer = document.getElementById('resultContainer');
+    const result = document.getElementById('result');
+    const classification = document.getElementById('classification');
+    const styleContainer = document.getElementById("styleContainer");
+    const styleMessage = document.getElementById("styleMessage");
+    const lowerBodyMessages = document.getElementById("lowerBodyMessages");
+
+    const styleMessages = {
+      "삼각형": "어깨가 넓은 <b>삼각형<b>의 상체의 경우<b>오버사이즈 핏<b>의 상의가 어깨와 가슴을<br> 넓어 보이게 하여 체형의 균형을 잡아줍니다!",
+      "역삼각형": "어깨가 좁은 <b>역삼각형<b> 상체의 경우<b>노멀한 핏<b>이 어깨의 넓이를 강조하지 않으면서 <br> 몸의 전체적인 비율을 균형 있게 보이게 합니다!",
+      "직사각형": "어깨와 허리가 일자형인 <b>직사각형<b> 상체의 경우 <b>루즈핏<b>이 허리선을 부각시키지 않으면서 자연스럽게 <br> 체형에 여유를 더해 조화롭고 세련된 실루엣을 만들어줍니다!",
+      "원형": "옆구리가 튀어나온 <b>원형<b> 체형의 경우 <b>루즈핏<b>이 몸에 달라붙지 않아 <br> 체형을 자연스럽게 커버하고 시각적으로 슬림해 보이게 하기 때문입니다.",
+      "모래시계형": "<b>타이트핏<b>이 허리선을 강조하여 <br> 체형의 균형감과 곡선미를 돋보이게 합니다!"
+    };
+
+    const lowerBodyMessageses = {
+  "삼각하체_롱다리": "허벅지가 종아리에 비해 굵은 <b>삼각하체</b> 체형에서는 종아리 아래로 <br> 퍼지는 벨보텀 핏이 허벅지의 부각을 완화하며 체형의 균형을 맞춰주며 <br> 벨보텀 실루엣이 다리길이를 더욱 강조합니다." +
+      "<br><br>미디 및 니렝스 기장은 <b>삼각하체</b>에서 다리의 가장 볼륨감 <br> 있는 부분(허벅지)을 자연스럽게 가리면서 <br>종아리와 발목을 드러내어 슬림한 라인을 강조합니다." +
+      "<br><br>롱다리와 결합되면 다리의 길이는 충분히 강조되면서도 체형이 <br>과도하게 늘어 보이지 않아 균형 잡힌 스타일을 연출합니다.",
+  "삼각하체_숏다리": "허벅지가 종아리에 비해 굵은 <b>삼각하체</b> 체형에서는 종아리 아래로 퍼지는 <br> 벨보텀 핏이 허벅지의 부각을 완화하며 체형의 균형을 잡아줍니다." +
+      "<br><br>발목 쪽으로 자연스럽게 퍼지는 <b>벨보텀<b>이 시선을 아래로 분산시켜 <br> 다리를 시각적으로 더 길어 보이게 만듭니다." +
+      "<br><br> <b>맥시 기장<b>은 다리 전체를 덮으면서 다리의 굵기를 숨기고, <br>하체를 시각적으로 길어 보이게 만듭니다. <br><br> 특히 <b>삼각하체</b>의 굵은 허벅지를 가릴 수 있어 <br> 체형의 단점을 커버하는 데 효과적입니다.",
+  "역삼각하체_롱다리": "허벅지보다 종아리가 더 굵은 <b>역삼각하체</b> 체형에서는 와이드 핏이 <br> 허벅지와 종아리 간의 체형 차이를 자연스럽게 숨겨주며, 하체 전체를 균형 잡힌 실루엣으로 만들어줍니다." +
+      "<br><br>넉넉한 실루엣이 다리의 길이를 과도하게 부각하지 않고도 우아한 비율을 강조합니다." +
+      "<br><br><b>미디 기장<b>은 허벅지 중간부터 종아리 상단까지 적절히 드러내, <br> 종아리가 지나치게 두드러지지 않으면서도 다리 라인을 자연스럽게 보여줍니다.",
+  "역삼각하체_숏다리": "허벅지보다 종아리가 굵은 <b>역삼각하체</b> 체형에서는 와이드 핏이 <br> 허벅지와 종아리의 체형 차이를 자연스럽게 완화하며, <br> 하체 전체적으로 균형 잡힌 실루엣을 만들어줍니다." +
+      "<br><br>숏다리 조건에서는 <b>와이드 핏<b>이 다리의 짧은 비율을 숨기고, <br> 하체를 시각적으로 더 길고 날씬하게 보이게 합니다." +
+      "<br><br> <b>맥시 기장<b>은 다리 전체를 덮어 하체 길이를 시각적으로 <br> 늘려주는 효과가 있습니다. <br> 종아리가 두드러지는 <b>역삼각하체</b>의 특징을 가리면서 허리선부터 발끝까지 <br> 길고 매끄러운 라인을 연출해줍니다.",
+  "일자하체_롱다리": "허벅지와 종아리가 균일한 <b>일자하체</b> 체형에서는 스키니 핏이 <br> 다리의 곧고 날씬한 실루엣을 그대로 드러내어 <br>심플하고 세련된 느낌을 줍니다." +
+      "<br><br>롱다리 조건에서는 다리 라인을 강조하여 다리의 길이를 <br>더욱 돋보이게 하며, 전체적으로 늘씬하고 길어 보이는 효과를 줍니다." +
+      "<br><br> <b>미디 기장<b>은 허벅지와 종아리의 적절한 부분을 드러내어 <br> 다리의 균형감과 길이를 자연스럽게 강조합니다. <br> 롱다리 체형과 결합되면 다리가 과도하게 길어 보이지 않으면서도 <br>세련된 비율을 유지하도록 돕습니다.",
+  "일자하체_숏다리": "허벅지와 종아리가 균일한 <b>일자하체</b> 체형에서는 스키니 핏이 <br>하체의 깔끔하고 날씬한 라인을 강조하며, <br> 체형의 장점을 돋보이게 합니다." +
+      "<br><br>숏다리 조건에서도 <b>스키니 핏<b>은 다리 실루엣을 드러내어 <br>시각적으로 길고 곧아 보이는 효과를 줍니다." +
+      "<br><br> <b>맥시 기장<b>은 다리를 길게 덮어 숏다리 체형의 단점을 보완하며, <br>시선을 아래로 분산시켜 다리를 시각적으로 더 길어 보이게 합니다. " +
+      "<br><br> <b>스키니 핏<b>과 결합될 경우, 다리의 실루엣은 날씬하게 드러나면서 <br>맥시 기장이 다리의 길이를 추가로 강조하는 역할을 합니다."
+};
+
+    let captureCount = 0;
+    let predictionSum = [0, 0, 0, 0, 0, 0, 0];
+    let shapeResults = [];
+    let lowerBodyResults = [];
+    let legLengthResults = [];
+
+navigator.mediaDevices.getUserMedia({
+  video: {
+    width: { ideal: 1024 },
+    height: { ideal: 1024 },
+    facingMode: "user",
+    aspectRatio: 1 / 1,  // 정사각형 비율로 설정
+  }
+})
+      .then((stream) => {
+        video.srcObject = stream;
+      })
+      .catch((err) => {
+        console.error("Error accessing camera:", err);
+      });
+
+    captureButton.addEventListener("click", () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth;
+      canvas.height = video.videoHeight;
+      const context = canvas.getContext("2d");
+      context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+      const imageData = canvas.toDataURL("image/jpeg");
+
+      fetch("/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ image: imageData }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.error) {
+            alert("전신이 제대로 감지되지 않았습니다. 다시 촬영하세요!");
+          } else {
+            captureCount++;
+            countMessage.textContent = `현재 촬영: ${captureCount}/3 (${3 - captureCount}회 남았습니다)`;
+
+            for (let i = 0; i < predictionSum.length; i++) {
+              predictionSum[i] += data.predictions[0][i];
+            }
+            shapeResults.push(data.shape_result);
+            lowerBodyResults.push(data.lower_body_result);
+            legLengthResults.push(data.leg_length_result);
+
+            if (captureCount === 1) {
+              countMessage.textContent = "분석 중입니다...";
+              setTimeout(() => {
+                cameraContainer.style.transform = "translateX(-110%)";
+
+                setTimeout(() => {
+                  const averagedPredictions = predictionSum.map((val) =>
+                    (val / 3).toFixed(2)
+                  );
+
+                  resultContainer.classList.remove("hidden");
+                  resultContainer.style.display = "block";
+                  resultContainer.style.opacity = 1;
+
+                  const fullResults = [
+                    `<span style="font-size: 30px; font-weight: bold; color:blue">[예측된 신체 치수]</span><br><br>`, // 3칸 줄바꿈 추가
+                    `키: ${predictionSum[0].toFixed(3)}`,
+                    `샅높이: ${predictionSum[1].toFixed(3)}`,
+                    `가슴둘레: ${predictionSum[2].toFixed(3)}`,
+                    `허리둘레: ${predictionSum[3].toFixed(3)}`,
+                    `엉덩이둘레: ${predictionSum[4].toFixed(3)}`,
+                    `넙다리둘레: ${predictionSum[5].toFixed(3)}`,
+                    `장딴지둘레: ${predictionSum[6].toFixed(3)}`,
+                    `상체 체형: ${getMostFrequent(shapeResults)}`,
+                    `하체 체형: ${getMostFrequent(lowerBodyResults)}`,
+                    `다리 길이: ${getMostFrequent(legLengthResults)}`,
+                  ];
+
+                  result.innerHTML = "";
+                  classification.innerHTML = "";
+
+                  let delay = 0;
+
+                  fullResults.forEach((line, index) => {
+                    setTimeout(() => {
+                      const target = index < 8 ? result : classification;
+                      const span = document.createElement("span");
+                      target.appendChild(span);
+
+                      printText(span, line, 25);
+                    }, delay);
+                    delay += line.length * 25 + 100;
+                  });
+
+                  // 스타일 컨테이너가 등장하도록 설정
+                  setTimeout(() => {
+                    styleContainer.classList.remove("hidden");
+                    styleContainer.style.display = "block";
+
+                    // 상체 체형에 따라 스타일 메시지 출력
+                    const bodyShape = getMostFrequent(shapeResults);
+                    const lowerBodyShape = getMostFrequent(lowerBodyResults);
+                    const legLength = getMostFrequent(legLengthResults);
+
+                    const lowerBodyKey = `${lowerBodyShape}_${legLength}`;
+
+                    const shapeMessage = styleMessages[bodyShape] || "체형 정보를 분석 중입니다.";
+                    const lowerBodyMessage = lowerBodyMessageses[lowerBodyKey] || "하체 체형과 다리 길이 정보를 분석 중입니다.";
+
+                    styleMessage.innerHTML = `<strong>[${bodyShape} 상체]</strong><br>${shapeMessage}<br><br>
+                                              <strong>[${lowerBodyShape}]</strong><br>${lowerBodyMessage}`;
+                    styleMessage.style.textAlign = "left"; // 왼쪽 정렬 설정
+                      setTimeout(() => {
+    const button = document.getElementById("findFashionItemsButton");
+    button.style.display = "block"; // 버튼 표시
+    button.style.opacity = "1";},2000)// 부드러운 등장 효과
+                  }, delay + 1000); // 결과 컨테이너 출력 후 1초 대기
+                }, 2000);
+              }, 2000);
+            }
+          }
+        })
+        .catch((error) => console.error("Error:", error));
+    });
+
+function printText(span, line, interval) {
+  let i = 0;
+  const timer = setInterval(() => {
+    // HTML 태그를 올바르게 처리하기 위해 slice 사용
+    span.innerHTML = line.slice(0, i + 1);
+    i++;
+    if (i >= line.length) {
+      clearInterval(timer);
+      span.innerHTML += "<br>"; // 줄바꿈 추가
+    }
+  }, interval);
+}
+
+  // 버튼 생성 함수
+  function createFindFashionItemsButton() {
+    const button = document.getElementById("findFashionItemsButton");
+    button.style.display = "block"; // 버튼 표시
+    button.style.opacity = "1"; // 부드러운 등장 효과
+  }
+    function getMostFrequent(array) {
+      const frequency = {};
+      let maxFreq = 0;
+      let mostFrequent = null;
+
+      for (const item of array) {
+        frequency[item] = (frequency[item] || 0) + 1;
+        if (frequency[item] > maxFreq) {
+          maxFreq = frequency[item];
+          mostFrequent = item;
+        }
+      }
+      return mostFrequent;
+    }
+
+    function goToIndex3() {
+  window.location.href = "index3"; // index3.html 경로로 이동
+}
+  </script>
+</body>
+</html>

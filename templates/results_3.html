@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>검색 결과</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>검색 결과</h1>
+
+    <!-- Top Results -->
+    <h2>상의 (Top)</h2>
+    <ul class="top-results">
+        {% for item in results.top %}
+            <li>
+                <strong>상품명:</strong> {{ item.title }}<br>
+                <strong>브랜드:</strong> {{ item.get('brand', 'N/A') }}<br>
+                <strong>가격:</strong> {{ item.lprice }}원<br>
+                <strong>링크:</strong> <a href="{{ item.link }}">{{ item.link }}</a><br>
+                <img src="{{ item.image }}" alt="{{ item.title }}" style="max-width: 200px;"><br>
+                <button onclick="generateMask('{{ item.image }}', 'top')">[이 옷 입어보기]</button>
+            </li>
+        {% endfor %}
+    </ul>
+    <button onclick="searchAgain('top')">상의 다시 검색하기</button>
+
+
+    <!-- Bottom Results -->
+    <h2>하의 (Bottom)</h2>
+    <ul class="bottom-results">
+        {% for item in results.bottom %}
+            <li>
+                <strong>상품명:</strong> {{ item.title }}<br>
+                <strong>브랜드:</strong> {{ item.get('brand', 'N/A') }}<br>
+                <strong>가격:</strong> {{ item.lprice }}원<br>
+                <strong>링크:</strong> <a href="{{ item.link }}">{{ item.link }}</a><br>
+                <img src="{{ item.image }}" alt="{{ item.title }}" style="max-width: 200px;"><br>
+            </li>
+        {% endfor %}
+    </ul>
+    <button onclick="searchAgain('bottom')">하의 다시 검색하기</button>
+
+    <!-- Outer Results -->
+    <h2>아우터 (Outer)</h2>
+    <ul class="outer-results">
+        {% for item in results.outer %}
+            <li>
+                <strong>상품명:</strong> {{ item.title }}<br>
+                <strong>브랜드:</strong> {{ item.get('brand', 'N/A') }}<br>
+                <strong>가격:</strong> {{ item.lprice }}원<br>
+                <strong>링크:</strong> <a href="{{ item.link }}">{{ item.link }}</a><br>
+                <img src="{{ item.image }}" alt="{{ item.title }}" style="max-width: 200px;"><br>
+            </li>
+        {% endfor %}
+    </ul>
+    <button onclick="searchAgain('outer')">아우터 다시 검색하기</button>
+
+    <!-- Onepiece Results -->
+    <h2>원피스 (Onepiece)</h2>
+    <ul class="dress-results">
+        {% for item in results.dress %}
+            <li>
+                <strong>상품명:</strong> {{ item.title }}<br>
+                <strong>브랜드:</strong> {{ item.get('brand', 'N/A') }}<br>
+                <strong>가격:</strong> {{ item.lprice }}원<br>
+                <strong>링크:</strong> <a href="{{ item.link }}">{{ item.link }}</a><br>
+                <img src="{{ item.image }}" alt="{{ item.title }}" style="max-width: 200px;"><br>
+            </li>
+        {% endfor %}
+    </ul>
+    <button onclick="searchAgain('dress')">원피스 다시 검색하기</button>
+
+    <a href="/">다시 검색하기</a>
+
+    <!-- Scripts -->
+
+    <script>
+function generateMask(imagePath, query) {
+    $.ajax({
+        url: '/segment',  // 서버의 '/segment' 경로로 요청 전송
+        type: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ "image_path": imagePath, "query": query }),
+        success: function(response) {
+            alert(response.message);  // 세그멘테이션 성공 시 메시지 표시
+
+            // 세그멘테이션 성공 후 5초 대기
+            setTimeout(() => {
+                // GET 요청을 통해 "/2"로 이동
+                fetch("/2", {
+                    method: "GET",
+                })
+                .then((response) => response.text())
+                .then((data) => {
+                    console.log("GET 요청 성공:", data);
+
+                    // 새로운 URL로 페이지 이동
+                    window.location.href = "2";
+
+                    // 페이지가 로드된 후 추가 작업 실행
+                    $(window).on("load", function() {
+                        console.log("페이지 로드 완료 후 추가 작업 실행");
+                    });
+                })
+                .catch((error) => {
+                    console.error("Error:", error);
+                    alert("VTON 작업 실행 중 오류가 발생했습니다.");
+                });
+            }, 300);  // 5초 대기
+        },
+        error: function(error) {
+            alert("세그멘테이션 작업 중 오류가 발생했습니다.");
+        }
+    });
+}
+        // "상의 다시 검색하기" 버튼 클릭 시 동작
+
+        let savedResults = {
+            top: [],
+            bottom: [],
+            outer: [],
+            dress: []
+        };
+
+
+        function searchAgain(category) {
+            $.ajax({
+                url: '/search-category',  // 카테고리별 검색을 위한 서버 경로
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ category: category }),  // 카테고리 정보를 서버에 전달
+                success: function(response) {
+                    // 서버에서 받은 새 검색 결과를 해당 카테고리에 업데이트
+                    const updatedResults = response.results;
+
+                    // 기존 savedResults에 새로운 검색 결과 병합
+                    savedResults[category] = updatedResults[category];
+
+                    // 페이지를 업데이트
+                    updateResults();
+                },
+                error: function(error) {
+                    alert("다시 검색하는 중 오류가 발생했습니다.");
+                }
+            });
+        }
+
+        function updateResults() {
+            // 각 카테고리의 검색 결과를 HTML에 반영
+            const categories = ['top', 'bottom', 'outer', 'dress'];
+
+            categories.forEach(category => {
+                const resultContainer = $(`.${category}-results`); // 각 카테고리 결과 영역
+                resultContainer.empty(); // 기존 내용을 비웁니다.
+
+                savedResults[category].forEach(item => {
+                    resultContainer.append(`
+                        <li>
+                            <strong>상품명:</strong> ${item.title}<br>
+                            <strong>브랜드:</strong> ${item.brand || 'N/A'}<br>
+                            <strong>가격:</strong> ${item.lprice}원<br>
+                            <strong>링크:</strong> <a href="${item.link}">${item.link}</a><br>
+                            <img src="${item.image}" alt="${item.title}" style="max-width: 200px;"><br>
+                            <button onclick="generateMask('${item.image}', '${category}')">객체 마스크 생성</button>
+                        </li>
+                    `);
+                });
+            });
+        }
+
+
+    </script>
+</body>
+</html>
