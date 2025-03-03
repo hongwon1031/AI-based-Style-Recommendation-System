@@ -17,6 +17,7 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 <img src="/동작예시1.png" width="800" height="400">
 <img src="/동작예시2.png" width="800" height="400">
 <img src="/동작예시3.jpg" width="800" height="400">
+
 # image path
 - segmented image(cloth)
   - Graphonomy-master/HR-VITON-main/test/test/cloth
