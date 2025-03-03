@@ -17,14 +17,19 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 # image path
 - segmented image(cloth)
   - Graphonomy-master/HR-VITON-main/test/test/cloth
+  - <img src="/HR-VITON-main/test/test/cloth/00001_00.jpg" width="300" height="400">
 - mask image(cloth)
   - Graphonomy-master/HR-VITON-main/test/test/cloth-mask
-- segmentation(cloth)
+  - <img src="/HR-VITON-main/test/test/cloth-mask/00001_00.jpg" width="300" height="400">
+- Segmentated image(model)
   - Graphonomy-master/HR-VITON-main/test/test/image
-- Semantic Segmentation
+  - <img src="/HR-VITON-main/test/test/image/00001_00.jpg" width="300" height="400">
+- Semantic Segmentation(model)
   - Graphonomy-master/HR-VITON-main/test/test/image-densepose
-- Semantic Segmentation(grayscale)
+  - <img src="/HR-VITON-main/test/test/image-densepose/00001_00.jpg" width="300" height="400">
+- Semantic Segmentation_grayscale(model)
   - Graphonomy-master/HR-VITON-main/test/test/image-parse-v3
+  - <img src="/HR-VITON-main/test/test/image-parse-v3/00001_00.jpg" width="300" height="400">
 - Output Image
   - Graphonomy-master/HR-VITON-main/Output
   - <img src="/HR-VITON-main/Output/output_00000.png" width="300" height="400">
