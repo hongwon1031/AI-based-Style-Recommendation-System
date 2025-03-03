@@ -10,50 +10,50 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 <img src="/부록.png" width="1636" height="458">
 
 # How to use
-- install the package('https://github.com/hongwon1031/pro/blob/master/requirements.txt')
-- download pretrained CNN model 'https://drive.google.com/file/d/1nkcS0pXqqoy2PGaLDLAa16Cx5rzmA1n4/view?usp=sharing'
-- setting the file path(app2.py, main.py)
-- install the app2.py
-<img src="/동작예시1.png" width="800" height="400">
-<img src="/동작예시2.png" width="800" height="400">
-<img src="/동작예시3.jpg" width="800" height="400">
+  - install the package('https://github.com/hongwon1031/pro/blob/master/requirements.txt')
+  - download pretrained CNN model 'https://drive.google.com/file/d/1nkcS0pXqqoy2PGaLDLAa16Cx5rzmA1n4/view?usp=sharing'
+  - setting the file path(app2.py, main.py)
+  - install the app2.py
+  <img src="/동작예시1.png" width="800" height="400">
+  <img src="/동작예시2.png" width="800" height="400">
+  <img src="/동작예시3.jpg" width="800" height="400">
 
 # image path
-- segmented image(cloth)
-  - Graphonomy-master/HR-VITON-main/test/test/cloth
-  - <img src="/HR-VITON-main/test/test/cloth/00001_00.jpg" width="300" height="400">
-- mask image(cloth)
-  - Graphonomy-master/HR-VITON-main/test/test/cloth-mask
-  - <img src="/HR-VITON-main/test/test/cloth-mask/00001_00.jpg" width="300" height="400">
-- Segmentated image(model)
-  - Graphonomy-master/HR-VITON-main/test/test/image
-  - <img src="/HR-VITON-main/test/test/image/00001_00.jpg" width="300" height="400">
-- Semantic Segmentation(model)
-  - Graphonomy-master/HR-VITON-main/test/test/image-densepose
-  - <img src="/HR-VITON-main/test/test/image-densepose/00001_00.jpg" width="300" height="400">
-- Semantic Segmentation_grayscale(model)
-  - Graphonomy-master/HR-VITON-main/test/test/image-parse-v3
-  - <img src="/HR-VITON-main/test/test/image-parse-v3/00001_00.png" width="300" height="400">
-- Output Image
-  - Graphonomy-master/HR-VITON-main/Output
-  - <img src="/HR-VITON-main/Output/output_00000.png" width="300" height="400">
+  - segmented image(cloth)
+    - Graphonomy-master/HR-VITON-main/test/test/cloth
+    - <img src="/HR-VITON-main/test/test/cloth/00001_00.jpg" width="300" height="400">
+  - mask image(cloth)
+    - Graphonomy-master/HR-VITON-main/test/test/cloth-mask
+    - <img src="/HR-VITON-main/test/test/cloth-mask/00001_00.jpg" width="300" height="400">
+  - Segmentated image(model)
+    - Graphonomy-master/HR-VITON-main/test/test/image
+    - <img src="/HR-VITON-main/test/test/image/00001_00.jpg" width="300" height="400">
+  - Semantic Segmentation(model)
+    - Graphonomy-master/HR-VITON-main/test/test/image-densepose
+    - <img src="/HR-VITON-main/test/test/image-densepose/00001_00.jpg" width="300" height="400">
+  - Semantic Segmentation_grayscale(model)
+    - Graphonomy-master/HR-VITON-main/test/test/image-parse-v3
+    - <img src="/HR-VITON-main/test/test/image-parse-v3/00001_00.png" width="300" height="400">
+  - Output Image
+    - Graphonomy-master/HR-VITON-main/Output
+    - <img src="/HR-VITON-main/Output/output_00000.png" width="300" height="400">
 
 
 # References
-HR-VITON
-https://github.com/sangyun884/HR-VITON
-
-Posenet
-https://github.com/rwightman/posenet-python
-
-Graphonomy
-https://github.com/Gaoyiminggithub/Graphonomy
-
-detectron2
-https://github.com/facebookresearch/detectron2
-
-cloth image segmentation
-https://github.com/ternaus/cloths_segmentation
-
-Viton Model
-https://github.com/lastdefiance20/TryYours-Virtual-Try-On
+  HR-VITON
+  https://github.com/sangyun884/HR-VITON
+  
+  Posenet
+  https://github.com/rwightman/posenet-python
+  
+  Graphonomy
+  https://github.com/Gaoyiminggithub/Graphonomy
+  
+  detectron2
+  https://github.com/facebookresearch/detectron2
+  
+  cloth image segmentation
+  https://github.com/ternaus/cloths_segmentation
+  
+  Viton Model
+  https://github.com/lastdefiance20/TryYours-Virtual-Try-On
