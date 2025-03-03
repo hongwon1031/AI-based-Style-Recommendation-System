@@ -27,7 +27,7 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
   - Graphonomy-master/HR-VITON-main/test/test/image-parse-v3
 - Output Image
   - Graphonomy-master/HR-VITON-main/Output
-  - <img src="/HR-VITON-main/Output/output_00000.png" width="1000" height="1300">
+  - <img src="/HR-VITON-main/Output/output_00000.png" width="300" height="400">
 
 # References
 HR-VITON
