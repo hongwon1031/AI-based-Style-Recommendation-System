@@ -14,6 +14,9 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 - download pretrained CNN model 'https://drive.google.com/file/d/1nkcS0pXqqoy2PGaLDLAa16Cx5rzmA1n4/view?usp=sharing'
 - setting the file path(app2.py, main.py)
 - install the app2.py
+<img src="/동작예시1.png" width="800" height="400">
+<img src="/동작예시2.png" width="800" height="400">
+<img src="/동작예시3.png" width="800" height="400">
 # image path
 - segmented image(cloth)
   - Graphonomy-master/HR-VITON-main/test/test/cloth
