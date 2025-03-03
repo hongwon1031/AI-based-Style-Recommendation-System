@@ -9,24 +9,16 @@ HR-VTON(High-Resolution Virtual Try-On) 기법을 통해 가상 피팅을 제공
 
 
 
-## 성능 평가
-- MobileNet + CNN
-  - <img src="/cnn성능평가1.png" width="800" height="321">
-  - <img src="/cnn성능평가2.png" width="936" height="176">
-  - <img src="/cnn성능평가3.png" width="532" height="102">
-- DNN
-  - <img src="/dnn성능평가1.png" width="717" height="270">
-  - <img src="/dnn성능평가2.png" width="495" height="368">
-  - <img src="/dnn성능평가3.png" width="1322" height="362">
-    - 오차율 = |((입력 데이터 쓰레기 총량 - 예측 데이터 쓰레기 총량)/입력 데이터 쓰레기 총량)|
-    - 오차율 = |((10000 - 11439)/10000)| = 14.39%
+
+<img src="/포스터.jpg" width="7000" height="9933">
+<img src="/부록.png" width="1636" height="858">
 
 
 
 
 
 HR-VITON
-https://github.com/sangyun884/HR-VITON
+(https://github.com/sangyun884/HR-VITON)
 
 Posenet
 https://github.com/rwightman/posenet-python
